@@ -1,0 +1,8 @@
+input_path: /mnt/efs/dvcx-datacomp-sandbox-small
+filter_path: filter.npy
+shards_path: /mnt/efs/subset/shards
+train_path: train
+eval_data_path: /mnt/efs/eval_dataset
+eval_out_path: eval
+filter_args:
+  name: no_filter

@@ -1,0 +1,33 @@
+stages:
+  filter:
+    cmd: python baselines.py --metadata_dir ${input_path}/metadata --save_path ${filter_path} ${filter_args}
+    deps:
+      - baselines.py
+      - ${input_path}/metadata
+    outs:
+      - ${filter_path}
+  reshard:
+    cmd: python resharder.py -i ${input_path}/shards -o ${shards_path} -s ${filter_path}
+    deps:
+      - resharder.py
+      - ${input_path}/shards
+    outs:
+      - ${shards_path}:
+          cache: false 
+  train:
+    cmd: sbatch --wait slurm_train.sh ${shards_path} ${train_path}
+    deps:
+      - slurm_train.sh
+      - train.py
+      - ${shards_path}
+    outs:
+      - ${train_path}
+  eval:
+    cmd: sbatch --wait slurm_evaluate.sh ${train_path} ${eval_data_path} ${eval_out_path}
+    deps:
+      - slurm_evaluate.sh
+      - evaluate.py
+      - ${train_path}
+      - ${eval_data_path}
+    outs:
+      - ${eval_out_path}
