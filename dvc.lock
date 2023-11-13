@@ -1,0 +1,94 @@
+schema: '2.0'
+stages:
+  filter:
+    cmd: python baselines.py --metadata_dir /mnt/efs/dvcx-datacomp-sandbox-small/metadata
+      --save_path filter.npy --name no_filter
+    deps:
+    - path: /mnt/efs/dvcx-datacomp-sandbox-small/metadata
+      hash: md5
+      md5: 7ac49b54aa3ff0b49d3875a8a2c4b4e7.dir
+      size: 81707590807
+      nfiles: 52
+    - path: baselines.py
+      hash: md5
+      md5: 6977d713479d33e3467a2f031716ac79
+      size: 5620
+    outs:
+    - path: filter.npy
+      hash: md5
+      md5: e3a0ff15bcb234f6b86b381b9b861f09
+      size: 204800128
+  reshard:
+    cmd:
+    - mkdir -p /mnt/efs/subset/shards
+    - python resharder.py -i /mnt/efs/dvcx-datacomp-sandbox-small/shards -o /mnt/efs/subset/shards
+      -s filter.npy
+    deps:
+    - path: /mnt/efs/dvcx-datacomp-sandbox-small/shards
+      hash: md5
+      md5: 13962d1e7fa97d6e21453bcf1adb7c54.dir
+      size: 445535060163
+      nfiles: 3863
+    - path: resharder.py
+      hash: md5
+      md5: d237a5fa5720478aa5ddab24f640e26f
+      size: 36484
+    outs:
+    - path: /mnt/efs/subset/shards
+      hash: md5
+      md5: 2f6ca14f6443f9213ae445568642a8e4.dir
+      size: 441233913103
+      nfiles: 2290
+  train:
+    cmd: sbatch --wait slurm_train.sh /mnt/efs/subset/shards train
+    deps:
+    - path: /mnt/efs/subset/shards
+      hash: md5
+      md5: 2f6ca14f6443f9213ae445568642a8e4.dir
+      size: 441233913103
+      nfiles: 2290
+    - path: slurm_train.sh
+      hash: md5
+      md5: 8da31fed43efed16bbc66a3d361906b5
+      size: 1627
+    - path: train.py
+      hash: md5
+      md5: 27470ea75a5a51f50fcf68576bfaf45e
+      size: 10438
+    outs:
+    - path: train
+      hash: md5
+      md5: 84efd1eb4ee86659207beb01d08ea0eb.dir
+      size: 3631372634
+      nfiles: 5
+  eval:
+    cmd:
+    - sbatch --wait slurm_evaluate.sh train /mnt/efs/eval_dataset eval
+    deps:
+    - path: /mnt/efs/eval_dataset
+      hash: md5
+      md5: cf80882eebc1f9a2d78435bd91ed64ac.dir
+      size: 140744631536
+      nfiles: 14370
+    - path: evaluate.py
+      hash: md5
+      md5: 9335b353ff76a58ac4e1473e69bfc47b
+      size: 15566
+    - path: slurm_evaluate.sh
+      hash: md5
+      md5: 114b35da50edf3e5c864f25b812f489a
+      size: 709
+    - path: train
+      hash: md5
+      md5: 84efd1eb4ee86659207beb01d08ea0eb.dir
+      size: 3631372634
+      nfiles: 5
+    outs:
+    - path: eval/eval_results.json
+      hash: md5
+      md5: 4a61a478d23565aa22ddf5833f7beb5d
+      size: 15716
+    - path: eval/eval_results.jsonl
+      hash: md5
+      md5: 13e1e00d5d27eacb4ce43b082801419b
+      size: 16836

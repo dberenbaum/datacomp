@@ -7,7 +7,9 @@ stages:
     outs:
       - ${filter_path}
   reshard:
-    cmd: python resharder.py -i ${input_path}/shards -o ${shards_path} -s ${filter_path}
+    cmd: 
+      - mkdir -p ${shards_path}
+      - python resharder.py -i ${input_path}/shards -o ${shards_path} -s ${filter_path}
     deps:
       - resharder.py
       - ${input_path}/shards
@@ -23,11 +25,14 @@ stages:
     outs:
       - ${train_path}
   eval:
-    cmd: sbatch --wait slurm_evaluate.sh ${train_path} ${eval_data_path} ${eval_out_path}
+    cmd: 
+    - sbatch --wait slurm_evaluate.sh ${train_path} ${eval_data_path} ${eval_out_path}
     deps:
       - slurm_evaluate.sh
       - evaluate.py
       - ${train_path}
       - ${eval_data_path}
     outs:
-      - ${eval_out_path}
+      - ${eval_out_path}/eval_results.jsonl
+    metrics:
+      - ${eval_out_path}/eval_results.json

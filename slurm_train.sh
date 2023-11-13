@@ -29,7 +29,6 @@ echo go $COUNT_NODE
 echo $HOSTNAMES
 
 # Change these as needed!
-REPO_DIR="/mnt/efs/datacomp"
 DATA_PATH=$1
 SCALE="small"
 SEED=0
@@ -42,7 +41,9 @@ if [ "$SCALE" == "xlarge" ]; then
 fi
 
 # Setup env
-sudo apt install -y python3.9-dev python3.9-venv
+sudo add-apt-repository -y ppa:deadsnakes/ppa
+sudo apt update -y
+sudo apt install -y python3.10 python3.10-dev
 source ./.venv/bin/activate
 
 # Change comment as needed

@@ -320,6 +320,7 @@ if __name__ == "__main__":
     train_info = pickle.load(open(train_info_filename, "rb"))
 
     results_filename = args.output_dir / "eval_results.jsonl"
+    results_filename_json = args.output_dir / "eval_results.json"
 
     # Get list of datasets
     with open(os.path.join(os.path.dirname(__file__), "tasklist.yml")) as f:
@@ -401,6 +402,12 @@ if __name__ == "__main__":
             print(f"Score: {results[task_name]['metrics']['main_metric']:.4f}")
         else:
             print(f"Score: No summary metric")
+
+    with open(results_filename_json, "w+") as f:
+        metrics_dict = {}
+        for result in results.values():
+            metrics_dict[result["key"]] = {result["dataset"]: result["metrics"]}
+        json.dump(metrics_dict, f)
 
     elapsed = int(time.time()) - starttime
     print(

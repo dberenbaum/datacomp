@@ -17,7 +17,9 @@ DATA_DIR=$2
 OUTPUT_DIR=$3
 
 # Setup env
-sudo apt install -y python3.9-dev python3.9-venv
+sudo add-apt-repository -y ppa:deadsnakes/ppa
+sudo apt update -y
+sudo apt install -y python3.10-dev python3.10-venv
 source ./.venv/bin/activate
 
 # Run evaluation
