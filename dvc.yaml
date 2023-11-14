@@ -12,12 +12,13 @@ stages:
       - python resharder.py -i ${input_path}/shards -o ${shards_path} -s ${filter_path}
     deps:
       - resharder.py
+      - ${filter_path}
       - ${input_path}/shards
     outs:
       - ${shards_path}:
           cache: false 
   train:
-    cmd: sbatch --wait slurm_train.sh ${shards_path} ${train_path}
+    cmd: sbatch --wait ${slurm_train_args} slurm_train.sh ${shards_path} ${train_path}
     deps:
       - slurm_train.sh
       - train.py
@@ -25,8 +26,7 @@ stages:
     outs:
       - ${train_path}
   eval:
-    cmd: 
-    - sbatch --wait slurm_evaluate.sh ${train_path} ${eval_data_path} ${eval_out_path}
+    cmd: sbatch --wait ${slurm_evaluate_args} slurm_evaluate.sh ${train_path} ${eval_data_path} ${eval_out_path}
     deps:
       - slurm_evaluate.sh
       - evaluate.py

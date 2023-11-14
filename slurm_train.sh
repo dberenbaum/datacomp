@@ -3,15 +3,11 @@
 # Change these!
 #SBATCH --partition=queue1
 #SBATCH --job-name=train
-#SBATCH --nodes 1
-#SBATCH --ntasks-per-node=4
-#SBATCH --cpus-per-task=6
 #SBATCH --output=/mnt/efs/logs/%x_%j.out
 #SBATCH --error=/mnt/efs/logs/%x_%j.err
 #SBATCH --comment=first-try
 #SBATCH --open-mode=append
 #SBATCH --requeue
-#SBATCH --constraint=p3.16xlarge
 
 # Example usage:
 # sbatch slurm_train.sh

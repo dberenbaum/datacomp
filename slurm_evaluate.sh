@@ -1,16 +1,10 @@
 #!/bin/bash
 
 #SBATCH -p queue1
-#SBATCH -N 1
-#SBATCH -n 1
-#SBATCH -c 8
-#SBATCH -G 1
 #SBATCH -J "eval"
-#SBATCH --mem 32G
 #SBATCH -e "/mnt/efs/logs/%x_%j.err"
 #SBATCH -o "/mnt/efs/logs/%x_%j.out"
 #SBATCH --requeue
-#SBATCH --constraint p3.2xlarge
 
 TRAIN_OUTPUT_DIR=$1
 DATA_DIR=$2
