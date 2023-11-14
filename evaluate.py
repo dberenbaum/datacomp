@@ -403,12 +403,6 @@ if __name__ == "__main__":
         else:
             print(f"Score: No summary metric")
 
-    with open(results_filename_json, "w+") as f:
-        metrics_dict = {}
-        for result in results.values():
-            metrics_dict[result["key"]] = {result["dataset"]: result["metrics"]}
-        json.dump(metrics_dict, f)
-
     elapsed = int(time.time()) - starttime
     print(
         f"Evaluation time: {elapsed // 3600} hour(s) {elapsed % 3600 // 60} minute(s) {elapsed % 60} second(s)"
@@ -427,6 +421,12 @@ if __name__ == "__main__":
             ]
         )
         print(f"Average: {average}")
+
+    with open(results_filename_json, "w+") as f:
+        metrics_dict = {"average": average}
+        for result in results.values():
+            metrics_dict[result["key"]] = {result["dataset"]: result["metrics"]}
+        json.dump(metrics_dict, f)
 
     if args.submit:
         print("Done with evaluations. Preparing your submission...")
