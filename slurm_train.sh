@@ -36,14 +36,9 @@ if [ "$SCALE" == "xlarge" ]; then
     PRECISION="amp_bfloat16" # amp results in a significant performance drop at xlarge scale
 fi
 
-# Setup env
-sudo add-apt-repository -y ppa:deadsnakes/ppa
-sudo apt update -y
-sudo apt install -y python3.10 python3.10-dev
-source ./.venv/bin/activate
-
 # Change comment as needed
-srun --comment "<comment>" --cpu_bind=v --accel-bind=gn python train.py \
+srun --comment "<comment>" --cpu_bind=v --accel-bind=gn \
+    /mnt/efs/datacomp/.venv/bin/python train.py \
     --scale ${SCALE} \
     --data_dir ${DATA_PATH} \
     --output_dir ${OUTPUT_DIR} \

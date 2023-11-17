@@ -2,7 +2,7 @@ schema: '2.0'
 stages:
   filter:
     cmd: python baselines.py --metadata_dir /mnt/efs/dvcx-datacomp-sandbox-small/metadata
-      --save_path filter.npy --name basic_filter
+      --save_path filter.npy --name clip_score --arch l14 --fraction 0.3
     deps:
     - path: /mnt/efs/dvcx-datacomp-sandbox-small/metadata
       hash: md5
@@ -16,8 +16,8 @@ stages:
     outs:
     - path: filter.npy
       hash: md5
-      md5: d64237f202666bf294100aacc55cb28f
-      size: 47706400
+      md5: ed94deaa778e925dd67d0e61d2df3ac7
+      size: 61551728
   reshard:
     cmd:
     - mkdir -p /mnt/efs/subset/shards
@@ -31,8 +31,8 @@ stages:
       nfiles: 3863
     - path: filter.npy
       hash: md5
-      md5: d64237f202666bf294100aacc55cb28f
-      size: 47706400
+      md5: ed94deaa778e925dd67d0e61d2df3ac7
+      size: 61551728
     - path: resharder.py
       hash: md5
       md5: d237a5fa5720478aa5ddab24f640e26f
@@ -40,22 +40,22 @@ stages:
     outs:
     - path: /mnt/efs/subset/shards
       hash: md5
-      md5: c49ef0034ce7232bf5c92e2172fd9009.dir
-      size: 141179867413
-      nfiles: 534
+      md5: 7e13dd0722790154eb2cbdd2058be920.dir
+      size: 140615533220
+      nfiles: 694
   train:
-    cmd: sbatch --wait --nodes 1 --ntasks-per-node 4 --cpus-per-task 6 --constraint
-      p3.16xlarge slurm_train.sh /mnt/efs/subset/shards train
+    cmd: sbatch --wait --nodes 8 --ntasks-per-node 1 --cpus-per-task 1 --constraint
+      g4dn.xlarge slurm_train.sh /mnt/efs/subset/shards train
     deps:
     - path: /mnt/efs/subset/shards
       hash: md5
-      md5: c49ef0034ce7232bf5c92e2172fd9009.dir
-      size: 141179867413
-      nfiles: 534
+      md5: 7e13dd0722790154eb2cbdd2058be920.dir
+      size: 140615533220
+      nfiles: 694
     - path: slurm_train.sh
       hash: md5
-      md5: c44bb30b2648e98c0859aafc0d15e368
-      size: 1522
+      md5: add34d3b781ce34c3baca8d395693da1
+      size: 1405
     - path: train.py
       hash: md5
       md5: 27470ea75a5a51f50fcf68576bfaf45e
@@ -63,12 +63,12 @@ stages:
     outs:
     - path: train
       hash: md5
-      md5: 7f6ab0c8ed18cb6b6dfc53843814d86d.dir
-      size: 3631372640
+      md5: 193dc1767822d914c6bcef904f46f5ef.dir
+      size: 3631372646
       nfiles: 5
   eval:
-    cmd: sbatch --wait --nodes 1 --ntasks 1 --cpus-per-task 8 --gpus 1 --mem 32G --constraint
-      p3.2xlarge slurm_evaluate.sh train /mnt/efs/eval_dataset eval
+    cmd: sbatch --wait --nodes 1 --ntasks 1 --cpus-per-task 4 --gpus 1 --constraint
+      g4dn.xlarge slurm_evaluate.sh train /mnt/efs/eval_dataset eval
     deps:
     - path: /mnt/efs/eval_dataset
       hash: md5
@@ -81,19 +81,19 @@ stages:
       size: 15584
     - path: slurm_evaluate.sh
       hash: md5
-      md5: c0c0b67b025f35eaaf336d5c0d78f36a
-      size: 607
+      md5: 0c11bc89e45baf19c6e13e8bfd57d2e1
+      size: 479
     - path: train
       hash: md5
-      md5: 7f6ab0c8ed18cb6b6dfc53843814d86d.dir
-      size: 3631372640
+      md5: 193dc1767822d914c6bcef904f46f5ef.dir
+      size: 3631372646
       nfiles: 5
     outs:
     - path: eval/eval_results.json
       hash: md5
-      md5: 0a50dc8b3b9419b0b587a58c346120d9
-      size: 15781
+      md5: 4fe544b576a075a6a67b5353fdfbb833
+      size: 15768
     - path: eval/eval_results.jsonl
       hash: md5
-      md5: 99c018aaca65a0031805e598bcee8d56
-      size: 16869
+      md5: 55d103ec4ff02b683e8399d30ceeb1ba
+      size: 16856

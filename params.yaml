@@ -5,16 +5,17 @@ train_path: train
 eval_data_path: /mnt/efs/eval_dataset
 eval_out_path: eval
 filter_args:
-  name: basic_filter
+  name: clip_score
+  arch: l14
+  fraction: 0.3
 slurm_train_args:
-  nodes: 1
-  ntasks-per-node: 4
-  cpus-per-task: 6
-  constraint: p3.16xlarge
+  nodes: 8
+  ntasks-per-node: 1
+  cpus-per-task: 1
+  constraint: g4dn.xlarge
 slurm_evaluate_args:
   nodes: 1
   ntasks: 1
-  cpus-per-task: 8
+  cpus-per-task: 4
   gpus: 1
-  mem: 32G
-  constraint: p3.2xlarge
+  constraint: g4dn.xlarge
