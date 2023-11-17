@@ -320,6 +320,7 @@ if __name__ == "__main__":
     train_info = pickle.load(open(train_info_filename, "rb"))
 
     results_filename = args.output_dir / "eval_results.jsonl"
+    results_filename_json = args.output_dir / "eval_results.json"
 
     # Get list of datasets
     with open(os.path.join(os.path.dirname(__file__), "tasklist.yml")) as f:
@@ -420,6 +421,12 @@ if __name__ == "__main__":
             ]
         )
         print(f"Average: {average}")
+
+    with open(results_filename_json, "w+") as f:
+        metrics_dict = {"average": average}
+        for result in results.values():
+            metrics_dict[result["key"]] = {result["dataset"]: result["metrics"]}
+        json.dump(metrics_dict, f)
 
     if args.submit:
         print("Done with evaluations. Preparing your submission...")

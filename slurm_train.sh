@@ -1,14 +1,11 @@
 #!/bin/bash
 
 # Change these!
-#SBATCH --partition=<partition_name>
-#SBATCH --job-name=<job_name>
-#SBATCH --nodes 1
-#SBATCH --ntasks-per-node=4
-#SBATCH --cpus-per-task=6
-#SBATCH --output=%x_%j.out
-#SBATCH --error=%x_%j.err
-#SBATCH --comment=<comment>
+#SBATCH --partition=queue1
+#SBATCH --job-name=train
+#SBATCH --output=/mnt/efs/logs/%x_%j.out
+#SBATCH --error=/mnt/efs/logs/%x_%j.err
+#SBATCH --comment=first-try
 #SBATCH --open-mode=append
 #SBATCH --requeue
 
@@ -28,16 +25,22 @@ echo go $COUNT_NODE
 echo $HOSTNAMES
 
 # Change these as needed!
-DATA_PATH="/path/to/data/dir"
+DATA_PATH=$1
 SCALE="small"
 SEED=0
-OUTPUT_DIR="/path/to/output/dir"
+OUTPUT_DIR="."
 NUM_CHECKPOINTS=8
-EXP_NAME="datacomp-scale-${SCALE}-seed${SEED}"
+EXP_NAME=$2
 PRECISION="amp"  # We recommend using amp_bfloat16 if supported by your hardware.
 if [ "$SCALE" == "xlarge" ]; then
     PRECISION="amp_bfloat16" # amp results in a significant performance drop at xlarge scale
 fi
+
+# Setup env
+sudo add-apt-repository -y ppa:deadsnakes/ppa
+sudo apt update -y
+sudo apt install -y python3.10 python3.10-dev
+source ./.venv/bin/activate
 
 # Change comment as needed
 srun --comment "<comment>" --cpu_bind=v --accel-bind=gn python train.py \
@@ -48,5 +51,4 @@ srun --comment "<comment>" --cpu_bind=v --accel-bind=gn python train.py \
     --precision ${PRECISION} \
     --num_checkpoints ${NUM_CHECKPOINTS} \
     --seed ${SEED} \
-    --report_to_wandb \
     --accum_freq 1

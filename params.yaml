@@ -1,0 +1,20 @@
+input_path: /mnt/efs/dvcx-datacomp-sandbox-small
+filter_path: filter.npy
+shards_path: /mnt/efs/subset/shards
+train_path: train
+eval_data_path: /mnt/efs/eval_dataset
+eval_out_path: eval
+filter_args:
+  name: basic_filter
+slurm_train_args:
+  nodes: 1
+  ntasks-per-node: 4
+  cpus-per-task: 6
+  constraint: p3.16xlarge
+slurm_evaluate_args:
+  nodes: 1
+  ntasks: 1
+  cpus-per-task: 8
+  gpus: 1
+  mem: 32G
+  constraint: p3.2xlarge
