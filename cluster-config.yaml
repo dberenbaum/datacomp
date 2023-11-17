@@ -17,8 +17,14 @@ HeadNode:
         EnableWriteAccess: true
 Scheduling:
   Scheduler: slurm
+  SlurmSettings:
+    QueueUpdateStrategy: DRAIN
   SlurmQueues:
   - Name: queue1
+    CustomActions:
+      OnNodeConfigured:
+        Sequence:
+          - Script: s3://dvcx-datacomp-sandbox-workspace/init_env.sh
     Iam:
       S3Access:
         - BucketName: dvcx-datacomp-small
